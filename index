@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jin-Ho-Chill | 專題企劃</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Audiowide&family=VT323&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --neon-pink: #ff2a6d;
+        --neon-blue: #05d9e8;
+        --neon-purple: #d23aff;
+        --neon-yellow: #f9ed69;
+        --bg-dark: #01012b;
+        --glass-bg: rgba(255, 255, 255, 0.05);
+        --border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* --- 捲軸美化 --- */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-dark); }
+    ::-webkit-scrollbar-thumb { background: var(--neon-purple); border-radius: 4px; }
+
+    body {
+        background-color: var(--bg-dark);
+        color: #fff;
+        font-family: 'VT323', monospace;
+        overflow-x: hidden;
+        min-height: 100vh;
+        font-size: 18px;
+    }
+
+    /* --- 動態背景 --- */
+    .ambient-light {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: 
+            radial-gradient(circle at 15% 50%, rgba(210, 58, 255, 0.1), transparent 40%),
+            radial-gradient(circle at 85% 30%, rgba(5, 217, 232, 0.1), transparent 40%);
+        z-index: -1;
+        animation: floatingLights 10s ease-in-out infinite alternate;
+        filter: blur(40px);
+    }
+    @keyframes floatingLights {
+        0% { transform: scale(1); opacity: 0.7; }
+        100% { transform: scale(1.3); opacity: 1; }
+    }
+
+    /* --- 導覽列 --- */
+    nav {
+        position: fixed;
+        top: 0; width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 2rem;
+        background: rgba(1, 1, 43, 0.85);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border-bottom: 1px solid var(--border-color);
+        z-index: 1000;
+        flex-wrap: wrap;
+    }
+
+    .logo {
+        font-family: 'Audiowide', cursive;
+        font-size: 1.5rem;
+        text-shadow: 0 0 10px var(--neon-pink);
+        margin-right: 20px;
+    }
+
+    .nav-links {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        padding-bottom: 5px; /* for scrollbar on mobile */
+    }
+
+    .nav-links button {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: rgba(255, 255, 255, 0.7);
+        font-family: 'Press Start 2P', cursive;
+        font-size: 0.6rem;
+        cursor: pointer;
+        padding: 8px 12px;
+        transition: 0.3s;
+        white-space: nowrap;
+    }
+
+    .nav-links button:hover, .nav-links button.active {
+        color: #fff;
+        text-shadow: 0 0 8px var(--neon-blue);
+        border-color: var(--neon-blue);
+        background: rgba(5, 217, 232, 0.1);
+        box-shadow: 0 0 15px rgba(5, 217, 232, 0.3);
+    }
+
+    /* --- 內容容器 --- */
+    .container {
+        margin-top: 100px;
+        padding: 2rem;
+        max-width: 1100px;
+        margin-left: auto;
+        margin-right: auto;
+        padding-bottom: 100px;
+    }
+
+    .section {
+        display: none;
+        opacity: 0;
+    }
+
+    .section.active {
+        display: block;
+        animation: fadeInBlur 0.6s ease-out forwards;
+    }
+
+    @keyframes fadeInBlur {
+        0% { opacity: 0; filter: blur(10px); transform: translateY(10px); }
+        100% { opacity: 1; filter: blur(0); transform: translateY(0); }
+    }
+
+    /* --- 文字排版 --- */
+    h1 { 
+        font-family: 'Audiowide'; 
+        font-size: 2.8rem; 
+        text-shadow: 0 0 20px var(--neon-pink); 
+        margin-bottom: 1rem; 
+        line-height: 1.2;
+    }
+    h2 { 
+        font-family: 'Press Start 2P'; 
+        font-size: 1.1rem; 
+        color: var(--neon-blue); 
+        margin-bottom: 1.5rem; 
+        margin-top: 2rem;
+        border-left: 4px solid var(--neon-pink);
+        padding-left: 15px;
+        line-height: 1.6;
+    }
+    h3 {
+        font-family: 'VT323';
+        font-size: 1.8rem;
+        color: var(--neon-yellow);
+        margin-bottom: 1rem;
+        border-bottom: 1px dashed rgba(255,255,255,0.3);
+        padding-bottom: 5px;
+        display: inline-block;
+    }
+    p { 
+        line-height: 1.8; 
+        color: rgba(255,255,255,0.9); 
+        font-size: 1.3rem; 
+        margin-bottom: 1.5rem; 
+    }
+    
+    .highlight { color: var(--neon-yellow); font-weight: bold; }
+    .sub-text { font-size: 1rem; opacity: 0.7; }
+
+    /* --- 組件：玻璃面板 --- */
+    .glass-card {
+        background: var(--glass-bg);
+        border: 1px solid var(--border-color);
+        padding: 30px;
+        border-radius: 4px; /* 更方正一點 */
+        backdrop-filter: blur(5px);
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    .glass-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 4px; height: 100%;
+        background: linear-gradient(to bottom, var(--neon-pink), var(--neon-purple));
+    }
+
+    /* --- 組件：拍立得 --- */
+    .polaroid {
+        background: #fff;
+        padding: 12px 12px 50px 12px;
+        transform: rotate(-2deg);
+        transition: 0.4s;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        max-width: 350px;
+        margin: 0 auto;
+        color: #333;
+        font-family: 'Covered By Your Grace', cursive;
+        text-align: center;
+        font-weight: bold;
+    }
+    .polaroid:hover {
+        transform: rotate(0deg) scale(1.02);
+        box-shadow: 0 0 30px var(--neon-pink);
+        z-index: 10;
+    }
+    .polaroid img {
+        width: 100%;
+        height: auto;
+        display: block;
+        filter: contrast(1.1) grayscale(0.2);
+        background: #eee;
+        min-height: 250px;
+        object-fit: cover;
+    }
+
+    /* --- 組件：霓虹表格 (取代程式碼中大量文字) --- */
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 2rem;
+        font-size: 1.2rem;
+    }
+    .data-table th, .data-table td {
+        border: 1px solid rgba(5, 217, 232, 0.3);
+        padding: 12px 15px;
+        text-align: left;
+    }
+    .data-table th {
+        background: rgba(5, 217, 232, 0.1);
+        color: var(--neon-blue);
+        font-family: 'Audiowide';
+        font-size: 1rem;
+        text-transform: uppercase;
+    }
+    .data-table tr:hover td {
+        background: rgba(255, 42, 109, 0.05);
+        color: #fff;
+    }
+    .data-table td strong {
+        color: var(--neon-pink);
+    }
+
+    /* --- 排版 Grid --- */
+    .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        align-items: start;
+    }
+    .grid-2-center {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        align-items: center;
+    }
+
+    /* --- SWOT 格子 --- */
+    .swot-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    .swot-item {
+        background: rgba(0,0,0,0.3);
+        border: 1px solid;
+        padding: 20px;
+        border-radius: 8px;
+    }
+    .swot-s { border-color: var(--neon-blue); }
+    .swot-w { border-color: var(--neon-pink); }
+    .swot-o { border-color: var(--neon-yellow); }
+    .swot-t { border-color: var(--neon-purple); }
+    
+    .swot-title {
+        font-family: 'Press Start 2P';
+        font-size: 1rem;
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    /* --- Roadmap Timeline --- */
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+        border-left: 2px solid var(--neon-blue);
+    }
+    .timeline-item {
+        margin-bottom: 30px;
+        position: relative;
+    }
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -36px;
+        top: 5px;
+        width: 10px;
+        height: 10px;
+        background: var(--bg-dark);
+        border: 2px solid var(--neon-pink);
+        border-radius: 50%;
+        box-shadow: 0 0 10px var(--neon-pink);
+    }
+    .timeline-phase {
+        color: var(--neon-blue);
+        font-family: 'Audiowide';
+        font-size: 1.2rem;
+        margin-bottom: 5px;
+    }
+
+    /* --- Responsive --- */
+    @media (max-width: 768px) {
+        .grid-2, .grid-2-center, .swot-grid { grid-template-columns: 1fr; gap: 2rem; }
+        h1 { font-size: 2rem; }
+        .container { padding: 1.5rem; margin-top: 80px;}
+        nav { padding: 1rem; }
+        .data-table { display: block; overflow-x: auto; white-space: nowrap; }
+    }
+
+    /* Helper for hidden images */
+    .img-placeholder {
+        width: 100%; height: 250px; 
+        background: linear-gradient(45deg, #222, #333);
+        display: flex; align-items: center; justify-content: center;
+        color: #666; font-family: 'Audiowide'; font-size: 1.5rem;
+        border: 2px dashed #444;
+    }
+</style>
+</head>
+<body>
+
+    <div class="ambient-light"></div>
+
+    <nav>
+        <div class="logo">JHC</div>
+        <div class="nav-links">
+            <button onclick="switchTab('home')" id="btn-home" class="active">HOME</button>
+            <button onclick="switchTab('brand')" id="btn-brand">BRAND CORE</button>
+            <button onclick="switchTab('visual')" id="btn-visual">VISUALS</button>
+            <button onclick="switchTab('strategy')" id="btn-strategy">STRATEGY</button>
+            <button onclick="switchTab('products')" id="btn-products">PRODUCT</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        
+        <section id="home" class="section active">
+            <div class="grid-2-center">
+                <div>
+                    <h1>Seriously<br>Unserious.</h1>
+                    <p class="highlight">正經ㄉ胡鬧。笑著過生活。</p>
+                    <div class="glass-card">
+                        <h3 style="margin-top:0;">Jin-Ho-Chill 專題摘要</h3>
+                        <p>打造結合「生活風格 × 街頭休閒服飾」的品牌。回應當代年輕世代（15–30 歲）的集體焦慮。</p>
+                        <table class="data-table">
+                            <tr>
+                                <td><strong>Jin</strong></td>
+                                <td>自我、態度 (同設計人"俊"音)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Ho</strong></td>
+                                <td>真誠、笑聲 (台語"好")</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Chill</strong></td>
+                                <td>放鬆、自在 (台語"笑")</td>
+                            </tr>
+                        </table>
+                        <p style="font-size: 1rem; margin-top: 10px;">意指「真好笑(金厚秋)」。不急、不隱藏、不迎合，一種「軟性叛逆」。</p>
+                    </div>
+                </div>
+                <div class="polaroid">
+                    <div class="img-placeholder" style="background: url('box.png'), linear-gradient(135deg, #000, #222);">Mr. Chill Image</div>
+                    <div style="margin-top:10px;">Life's a Joke, Wear It.</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="brand" class="section">
+            <h1>BRAND ESSENCE</h1>
+            
+            <div class="glass-card">
+                <h2>核心概念：Seriously Unserious</h2>
+                <p>這是一個矛盾組合（Oxymoron）。字面雖是「不認真」，但我們表達的是<strong>「假裝嚴肅，實則開玩笑」</strong>的生活哲學。</p>
+                <ul>
+                    <li>做自己比扮演他人更重要</li>
+                    <li>生活已經夠嚴肅，穿搭就別再板著臉</li>
+                    <li>幽默是一種態度，不是敷衍</li>
+                </ul>
+            </div>
+
+            <div class="grid-2">
+                <div>
+                    <h2>核心架構系統</h2>
+                    <table class="data-table">
+                        <tr>
+                            <th>項目</th>
+                            <th>說明</th>
+                        </tr>
+                        <tr>
+                            <td><strong>核心價值</strong></td>
+                            <td>幽默、卡通化、反諷、Effortless Cool</td>
+                        </tr>
+                        <tr>
+                            <td><strong>品牌精神</strong></td>
+                            <td>負責把「嚴肅」轉述成「幽默」</td>
+                        </tr>
+                        <tr>
+                            <td><strong>品牌定位</strong></td>
+                            <td>服飾 × 生活哲學 × 情緒紓壓</td>
+                        </tr>
+                        <tr>
+                            <td><strong>關鍵字</strong></td>
+                            <td>Chill / Humor / Street / Cartoon / Irony</td>
+                        </tr>
+                    </table>
+                </div>
+                <div>
+                    <h2>研究動機</h2>
+                    <p>目前市場多數街頭品牌偏向嚴肅論述或強烈態度。</p>
+                    <p>JHC 切入<strong>「笑感設計」</strong>與<strong>「迷因文化」</strong>的空白市場，建立更具情感連結與共鳴感的自我表達媒介。</p>
+                    <div class="polaroid" style="transform: rotate(1deg) scale(0.9);">
+                        <div class="img-placeholder">Concept Art</div>
+                        <div style="margin-top:5px;">Draft v0.1</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="visual" class="section">
+            <h1>VISUAL IDENTITY</h1>
+            <p>手繪隨性 × 數位精緻。營造不修邊幅卻高度識別的街頭感。</p>
+
+            <div class="grid-2">
+                <div class="polaroid"><div class="img-placeholder">Sketch / Logo</div><div style="margin-top:5px;">Hand-drawn Vibes</div></div>
+                
+                <div>
+                    <div class="glass-card">
+                        <h3>3-1 Logo 與圖像</h3>
+                        <table class="data-table">
+                            <tr>
+                                <td><strong>主圖標</strong></td>
+                                <td>手繪感線條，不追求工整，展現個性。</td>
+                            </tr>
+                            <tr>
+                                <td><strong>輔助圖</strong></td>
+                                <td>星星、卡通元素、不對稱構圖。</td>
+                            </tr>
+                            <tr>
+                                <td><strong>角色 IP</strong></td>
+                                <td>具備延伸為品牌 IP 與虛擬角色的潛力。</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="glass-card">
+                    <h3>3-2 色彩計畫</h3>
+                    <div style="display:flex; gap:10px; margin-bottom:10px;">
+                        <div style="width:50px; height:50px; background:var(--neon-yellow); border:1px solid #fff;"></div>
+                        <div style="width:50px; height:50px; background:var(--neon-blue); border:1px solid #fff;"></div>
+                        <div style="width:50px; height:50px; background:#111; border:1px solid #fff;"></div>
+                        <div style="width:50px; height:50px; background:#555; border:1px solid #fff;"></div>
+                    </div>
+                    <table class="data-table">
+                        <tr>
+                            <th>類型</th>
+                            <th>色彩</th>
+                            <th>功能</th>
+                        </tr>
+                        <tr>
+                            <td><strong>主色</strong></td>
+                            <td><span style="color:var(--neon-yellow)">螢光黃</span>、<span style="color:var(--neon-blue)">電子藍</span></td>
+                            <td>年輕、數位、電氣感</td>
+                        </tr>
+                        <tr>
+                            <td><strong>輔助</strong></td>
+                            <td>碳黑、水洗灰</td>
+                            <td>平衡卡通感，提升實穿性</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="glass-card">
+                    <h3>3-3 字體風格</h3>
+                    <ul style="list-style: none;">
+                        <li style="margin-bottom:15px;">
+                            <span style="font-family:'Audiowide'; font-size:1.5rem;">TYPE A: 塗鴉字體</span><br>
+                            用於標語、主視覺，強化街頭感。
+                        </li>
+                        <li>
+                            <span style="font-family:'VT323'; font-size:1.5rem; background:#333;">TYPE B: 粗曠黑體</span><br>
+                            用於資訊文字，確保可讀性與結構感。
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="strategy" class="section">
+            <h1>STRATEGY & ANALYSIS</h1>
+            
+            <div class="glass-card">
+                <div class="grid-2">
+                    <div>
+                        <h2>4-1 市場定位</h2>
+                        <ul style="line-height: 2;">
+                            <li><strong>品類：</strong>生活風格 × 街頭休閒服飾</li>
+                            <li><strong>價位：</strong>中低價位 (學生/新鮮人友善)</li>
+                            <li><strong>訴求：</strong>高共鳴、易入手、情緒價值</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h2>4-2 目標客群 (15-30歲)</h2>
+                        <p>數位原住民、迷因愛好者。不追求名牌，尋找能代表自我情緒與幽默態度的品牌。</p>
+                        <p class="highlight">"不喜歡過於嚴肅或說教，重視個人特色。"</p>
+                    </div>
+                </div>
+            </div>
+
+            <h2>五、SWOT 分析</h2>
+            <div class="swot-grid">
+                <div class="swot-item swot-s">
+                    <span class="swot-title" style="color:var(--neon-blue)">STRENGTHS (優勢)</span>
+                    <ul>
+                        <li>強烈文化共感</li>
+                        <li>IP 角色化潛力</li>
+                        <li>市場風格差異化 (Funny vs Serious)</li>
+                    </ul>
+                </div>
+                <div class="swot-item swot-w">
+                    <span class="swot-title" style="color:var(--neon-pink)">WEAKNESSES (劣勢)</span>
+                    <ul>
+                        <li>初期聲量低</li>
+                        <li>生產規模限制 / 成本高</li>
+                        <li>高度依賴社群演算法</li>
+                    </ul>
+                </div>
+                <div class="swot-item swot-o">
+                    <span class="swot-title" style="color:var(--neon-yellow)">OPPORTUNITIES (機會)</span>
+                    <ul>
+                        <li>迷因病毒式傳播</li>
+                        <li>本土原創支持度攀升</li>
+                        <li>年輕族群對「真實感」的渴求</li>
+                    </ul>
+                </div>
+                <div class="swot-item swot-t">
+                    <span class="swot-title" style="color:var(--neon-purple)">THREATS (威脅)</span>
+                    <ul>
+                        <li>快時尚價格戰 (GU, Uniqlo)</li>
+                        <li>潮流審美更迭極快</li>
+                        <li>抄襲風險</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="grid-2" style="margin-top: 3rem;">
+                <div>
+                    <h2>八、品牌發展進程</h2>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-phase">PHASE 1: Launch (短期 1年)</div>
+                            <p>建立識別、打造角色插畫、首波 T-shirt 發售。</p>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-phase">PHASE 2: Growth (中期 2-3年)</div>
+                            <p>擴展配件線、主題系列(考季/社畜季)、強化世界觀。</p>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-phase">PHASE 3: Community (長期 3-5年)</div>
+                            <p>成為代表性街頭品牌、完整 IP 授權、線下派對。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="glass-card">
+                    <h2>行銷策略</h2>
+                    <table class="data-table">
+                        <tr><td><strong>迷因行銷</strong></td><td>虛擬角色「秋哥 Mr. Chill」厭世短影音</td></tr>
+                        <tr><td><strong>社群互動</strong></td><td>#JHC”今”厚秋 穿搭挑戰</td></tr>
+                        <tr><td><strong>產品標語</strong></td><td>「今天也很好笑」</td></tr>
+                        <tr><td><strong>通路</strong></td><td>90s 復古官網 + 週末市集快閃</td></tr>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="products" class="section">
+            <h1>PRODUCT STRATEGY</h1>
+            
+            <div class="glass-card">
+                <h2>6-1 首波系列：「基礎不基本」</h2>
+                <div class="grid-2">
+                    <div>
+                        <p>設計重點：不僅是一件衣服，是一個話題。</p>
+                        <table class="data-table">
+                            <tr>
+                                <th>品項</th>
+                                <th>設計重點</th>
+                            </tr>
+                            <tr>
+                                <td><strong>重磅 T-shirt</strong></td>
+                                <td>背面大面積憤怒星星，正面刺繡 Logo</td>
+                            </tr>
+                            <tr>
+                                <td><strong>反諷衛衣</strong></td>
+                                <td>厭世文字：I’m Chill (I’m not)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>日常配件</strong></td>
+                                <td>UFO 長襪、刺繡毛帽、帆布袋</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="polaroid" style="transform: rotate(2deg);">
+                        <div class="img-placeholder" style="background: #ccc; color: #111;">T-Shirt Mockup</div>
+                        <div style="margin-top:10px;">Back Print View</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card" style="text-align: center; border-color: var(--neon-pink);">
+                <h2 style="color: var(--neon-pink); border: none;">CONCLUSION</h2>
+                <p>Jin-Ho-Chill 不僅是一個服飾品牌，也是一場對「幽默感」的社會實踐。</p>
+                <p>讓穿搭成為一句<strong>「我不急，但我很有想法」</strong>的 Slogan。</p>
+                <p class="highlight" style="font-size: 1.5rem; margin-top: 20px;">讓「金厚秋」成為一種跨越語言的時髦態度。</p>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        function switchTab(tabId) {
+            // 1. Reset
+            const sections = document.querySelectorAll('.section');
+            const buttons = document.querySelectorAll('.nav-links button');
+
+            sections.forEach(s => {
+                s.classList.remove('active');
+                s.style.display = 'none';
+            });
+            buttons.forEach(b => b.classList.remove('active'));
+
+            // 2. Activate
+            const targetSection = document.getElementById(tabId);
+            const targetBtn = document.getElementById('btn-' + tabId);
+
+            if (targetSection) {
+                targetSection.style.display = 'block';
+                setTimeout(() => targetSection.classList.add('active'), 10);
+            }
+            if (targetBtn) {
+                targetBtn.classList.add('active');
+            }
+
+            // 3. Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        window.onload = function() {
+            switchTab('home');
+        };
+    </script>
+</body>
+</html>
